@@ -41,12 +41,12 @@ const dragSystem = (entities: Entities, { input }: any) => {
         const mouseX = mouseDown.payload.clientX - rect.left;
         const mouseY = mouseDown.payload.clientY - rect.top;
         
-        return {
+        entities = {
           ...entities,
           dragging: {
             id: pointId,
-            startX: point.x,
-            startY: point.y,
+            startX: mouseX,
+            startY: mouseY,
             offsetX: mouseX - point.x,
             offsetY: mouseY - point.y
           }
