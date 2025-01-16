@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { GameEngine } from 'react-game-engine';
-import { useSpring, animated } from '@react-spring/web';
 import { ControlPoint } from './ControlPoint';
 import { SplineCurve } from './SplineCurve';
 import { Grid } from './Grid';
@@ -17,11 +16,12 @@ export const PitchCurveEditor = () => {
   
   const entities = {
     points: {
-      points: points,
+      points,
+      setPoints,
       renderer: <ControlPoints points={points} />,
     },
     spline: {
-      points: points,
+      points,
       renderer: <SplineCurve points={points} />,
     },
     grid: {
@@ -35,11 +35,6 @@ export const PitchCurveEditor = () => {
         className="game-engine"
         systems={[systems.dragSystem]}
         entities={entities}
-        onEvent={(e: any) => {
-          if (e.type === 'point-moved') {
-            setPoints(e.points);
-          }
-        }}
       />
     </div>
   );

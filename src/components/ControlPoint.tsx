@@ -15,16 +15,9 @@ export const ControlPoint: React.FC<ControlPointProps> = ({ id, x, y }) => {
 
   return (
     <animated.div
-      style={{
-        ...spring,
-        position: 'absolute',
-        width: '12px',
-        height: '12px',
-        backgroundColor: '#3B82F6',
-        borderRadius: '50%',
-      }}
+      style={spring}
       data-point-id={id}
-      className="hover:scale-150 transition-transform duration-200 cursor-grab active:cursor-grabbing"
+      className="absolute w-3 h-3 bg-blue-500 rounded-full cursor-grab active:cursor-grabbing hover:scale-150 transition-transform duration-200"
     />
   );
 };

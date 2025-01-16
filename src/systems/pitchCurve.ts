@@ -7,14 +7,18 @@ interface Point {
 interface Entities {
   points: {
     points: Point[];
+    setPoints: (points: Point[]) => void;
   };
-  dragging?: string;
+  dragging?: {
+    id: string;
+    offsetX: number;
+    offsetY: number;
+  };
 }
 
-const dragSystem = (entities: Entities, { input, dispatch }: any) => {
+const dragSystem = (entities: Entities, { input }: any) => {
   if (!input) return entities;
 
-  const { points } = entities.points;
   const mouseDown = input.find((x: any) => x.type === "mousedown");
   const mouseMove = input.find((x: any) => x.type === "mousemove");
   const mouseUp = input.find((x: any) => x.type === "mouseup");
@@ -22,25 +26,23 @@ const dragSystem = (entities: Entities, { input, dispatch }: any) => {
   if (mouseDown) {
     const target = mouseDown.payload.target;
     const pointId = target.dataset.pointId;
+    
     if (pointId) {
       const container = target.closest('.game-engine');
       if (!container) return entities;
 
       const rect = container.getBoundingClientRect();
-      const x = mouseDown.payload.clientX - rect.left;
-      const y = mouseDown.payload.clientY - rect.top;
-
-      const updatedPoints = points.map(p => 
-        p.id === pointId ? { ...p, x, y } : p
-      );
-
-      dispatch({ type: 'point-moved', points: updatedPoints });
+      const point = entities.points.points.find(p => p.id === pointId);
       
-      return {
-        ...entities,
-        dragging: pointId,
-        points: { ...entities.points, points: updatedPoints },
-      };
+      if (point) {
+        const offsetX = mouseDown.payload.clientX - rect.left - point.x;
+        const offsetY = mouseDown.payload.clientY - rect.top - point.y;
+        
+        return {
+          ...entities,
+          dragging: { id: pointId, offsetX, offsetY }
+        };
+      }
     }
   }
 
@@ -49,25 +51,21 @@ const dragSystem = (entities: Entities, { input, dispatch }: any) => {
     if (!container) return entities;
 
     const rect = container.getBoundingClientRect();
-    const x = Math.max(0, Math.min(mouseMove.payload.clientX - rect.left, rect.width));
-    const y = Math.max(0, Math.min(mouseMove.payload.clientY - rect.top, rect.height));
+    const x = Math.max(0, Math.min(mouseMove.payload.clientX - rect.left - entities.dragging.offsetX, rect.width));
+    const y = Math.max(0, Math.min(mouseMove.payload.clientY - rect.top - entities.dragging.offsetY, rect.height));
 
-    const updatedPoints = points.map(p => 
-      p.id === entities.dragging ? { ...p, x, y } : p
+    const updatedPoints = entities.points.points.map(p =>
+      p.id === entities.dragging.id ? { ...p, x, y } : p
     );
 
-    dispatch({ type: 'point-moved', points: updatedPoints });
-
-    return {
-      ...entities,
-      points: { ...entities.points, points: updatedPoints },
-    };
+    entities.points.setPoints(updatedPoints);
+    
+    return entities;
   }
 
   if (mouseUp && entities.dragging) {
-    const updatedEntities = { ...entities };
-    delete updatedEntities.dragging;
-    return updatedEntities;
+    const { dragging, ...rest } = entities;
+    return rest;
   }
 
   return entities;
