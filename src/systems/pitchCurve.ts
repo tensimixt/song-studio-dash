@@ -19,11 +19,22 @@ interface Entities {
 }
 
 const dragSystem = (entities: Entities, { input }: any) => {
-  if (!input) return entities;
+  console.log('DragSystem called with input:', input);
+  
+  if (!input) {
+    console.log('No input received');
+    return entities;
+  }
 
   const mouseDown = input.find((x: any) => x.type === "mousedown");
   const mouseMove = input.find((x: any) => x.type === "mousemove");
   const mouseUp = input.find((x: any) => x.type === "mouseup");
+
+  console.log('Event types found:', {
+    hasMouseDown: !!mouseDown,
+    hasMouseMove: !!mouseMove,
+    hasMouseUp: !!mouseUp
+  });
 
   if (mouseDown) {
     console.log('MouseDown detected:', mouseDown);
@@ -73,13 +84,10 @@ const dragSystem = (entities: Entities, { input }: any) => {
     const mouseX = mouseMove.payload.clientX - rect.left;
     const mouseY = mouseMove.payload.clientY - rect.top;
 
-    const newX = mouseX - entities.dragging.offsetX;
-    const newY = mouseY - entities.dragging.offsetY;
-
-    console.log('New position:', { x: newX, y: newY });
+    console.log('New position:', { x: mouseX, y: mouseY });
 
     const updatedPoints = entities.points.points.map(p =>
-      p.id === entities.dragging.id ? { ...p, x: newX, y: newY } : p
+      p.id === entities.dragging.id ? { ...p, x: mouseX, y: mouseY } : p
     );
 
     entities.points.setPoints(updatedPoints);
