@@ -35,6 +35,7 @@ export const PitchCurveEditor = () => {
         className="game-engine"
         systems={[systems.dragSystem]}
         entities={entities}
+        style={{ width: '100%', height: '100%', position: 'relative' }}
       />
     </div>
   );

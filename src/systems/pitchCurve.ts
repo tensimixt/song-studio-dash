@@ -11,6 +11,8 @@ interface Entities {
   };
   dragging?: {
     id: string;
+    startX: number;
+    startY: number;
     offsetX: number;
     offsetY: number;
   };
@@ -35,12 +37,18 @@ const dragSystem = (entities: Entities, { input }: any) => {
       const point = entities.points.points.find(p => p.id === pointId);
       
       if (point) {
-        const offsetX = mouseDown.payload.clientX - rect.left - point.x;
-        const offsetY = mouseDown.payload.clientY - rect.top - point.y;
+        const offsetX = mouseDown.payload.clientX - rect.left;
+        const offsetY = mouseDown.payload.clientY - rect.top;
         
         return {
           ...entities,
-          dragging: { id: pointId, offsetX, offsetY }
+          dragging: {
+            id: pointId,
+            startX: point.x,
+            startY: point.y,
+            offsetX: offsetX - point.x,
+            offsetY: offsetY - point.y
+          }
         };
       }
     }
@@ -51,15 +59,14 @@ const dragSystem = (entities: Entities, { input }: any) => {
     if (!container) return entities;
 
     const rect = container.getBoundingClientRect();
-    const x = Math.max(0, Math.min(mouseMove.payload.clientX - rect.left - entities.dragging.offsetX, rect.width));
-    const y = Math.max(0, Math.min(mouseMove.payload.clientY - rect.top - entities.dragging.offsetY, rect.height));
+    const x = mouseMove.payload.clientX - rect.left - entities.dragging.offsetX;
+    const y = mouseMove.payload.clientY - rect.top - entities.dragging.offsetY;
 
     const updatedPoints = entities.points.points.map(p =>
       p.id === entities.dragging.id ? { ...p, x, y } : p
     );
 
     entities.points.setPoints(updatedPoints);
-    
     return entities;
   }
 
