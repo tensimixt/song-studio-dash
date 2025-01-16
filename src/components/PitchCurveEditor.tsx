@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GameEngine } from 'react-game-engine';
 import { useSpring, animated } from '@react-spring/web';
 import { ControlPoint } from './ControlPoint';
@@ -13,19 +13,21 @@ const initialPoints = [
 ];
 
 export const PitchCurveEditor = () => {
-  const [entities, setEntities] = React.useState({
+  const [points, setPoints] = useState(initialPoints);
+  
+  const entities = {
     points: {
-      points: initialPoints,
-      renderer: <ControlPoints />,
+      points: points,
+      renderer: <ControlPoints points={points} />,
     },
     spline: {
-      points: initialPoints,
-      renderer: <SplineCurve />,
+      points: points,
+      renderer: <SplineCurve points={points} />,
     },
     grid: {
       renderer: <Grid />,
     },
-  });
+  };
 
   return (
     <div className="w-full h-full relative">
@@ -35,17 +37,7 @@ export const PitchCurveEditor = () => {
         entities={entities}
         onEvent={(e: any) => {
           if (e.type === 'point-moved') {
-            setEntities(prev => ({
-              ...prev,
-              points: {
-                ...prev.points,
-                points: e.points,
-              },
-              spline: {
-                ...prev.spline,
-                points: e.points,
-              },
-            }));
+            setPoints(e.points);
           }
         }}
       />

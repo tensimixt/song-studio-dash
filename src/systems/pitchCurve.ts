@@ -11,7 +11,7 @@ interface Entities {
   dragging?: string;
 }
 
-const dragSystem = (entities: Entities, { input }: any) => {
+const dragSystem = (entities: Entities, { input, dispatch }: any) => {
   if (!input) return entities;
 
   const { points } = entities.points;
@@ -29,7 +29,6 @@ const dragSystem = (entities: Entities, { input }: any) => {
       
       entities.dragging = pointId;
       
-      // Update point position immediately on mouse down
       const updatedPoints = points.map(p => {
         if (p.id === pointId) {
           return { ...p, x, y };
@@ -37,6 +36,8 @@ const dragSystem = (entities: Entities, { input }: any) => {
         return p;
       });
 
+      dispatch({ type: 'point-moved', points: updatedPoints });
+      
       return {
         ...entities,
         points: {
@@ -61,6 +62,8 @@ const dragSystem = (entities: Entities, { input }: any) => {
       }
       return p;
     });
+
+    dispatch({ type: 'point-moved', points: updatedPoints });
 
     return {
       ...entities,
