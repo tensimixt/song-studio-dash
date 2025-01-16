@@ -20,20 +20,44 @@ const dragSystem = (entities: Entities, { input }: any) => {
   const mouseUp = input.find((x: any) => x.type === "mouseup");
 
   if (mouseDown) {
-    const pointId = mouseDown.payload.target.dataset.pointId;
+    const target = mouseDown.payload.target;
+    const pointId = target.dataset.pointId;
     if (pointId) {
+      const rect = target.closest('.game-engine').getBoundingClientRect();
+      const x = mouseDown.payload.clientX - rect.left;
+      const y = mouseDown.payload.clientY - rect.top;
+      
       entities.dragging = pointId;
+      
+      // Update point position immediately on mouse down
+      const updatedPoints = points.map(p => {
+        if (p.id === pointId) {
+          return { ...p, x, y };
+        }
+        return p;
+      });
+
+      return {
+        ...entities,
+        points: {
+          ...entities.points,
+          points: updatedPoints,
+        },
+      };
     }
   }
 
   if (mouseMove && entities.dragging) {
+    const container = document.querySelector('.game-engine');
+    if (!container) return entities;
+
+    const rect = container.getBoundingClientRect();
+    const x = mouseMove.payload.clientX - rect.left;
+    const y = mouseMove.payload.clientY - rect.top;
+
     const updatedPoints = points.map(p => {
       if (p.id === entities.dragging) {
-        return {
-          ...p,
-          x: mouseMove.payload.pageX,
-          y: mouseMove.payload.pageY,
-        };
+        return { ...p, x, y };
       }
       return p;
     });

@@ -30,6 +30,7 @@ export const PitchCurveEditor = () => {
   return (
     <div className="w-full h-full relative">
       <GameEngine
+        className="game-engine"
         systems={[systems.dragSystem]}
         entities={entities}
         onEvent={(e: any) => {
