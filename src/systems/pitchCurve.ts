@@ -30,6 +30,9 @@ const dragSystem = (entities: Entities, { input }: any) => {
     const target = mouseDown.payload.target;
     const pointId = target.dataset.pointId;
     
+    console.log('Target:', target);
+    console.log('Point ID:', pointId);
+    
     if (pointId) {
       const container = target.closest('.game-engine');
       if (!container) return entities;
@@ -37,9 +40,15 @@ const dragSystem = (entities: Entities, { input }: any) => {
       const rect = container.getBoundingClientRect();
       const point = entities.points.points.find(p => p.id === pointId);
       
+      console.log('Container found:', container);
+      console.log('Point found:', point);
+      
       if (point) {
         const mouseX = mouseDown.payload.clientX - rect.left;
         const mouseY = mouseDown.payload.clientY - rect.top;
+        
+        console.log('Mouse coordinates:', { mouseX, mouseY });
+        console.log('Point coordinates:', { x: point.x, y: point.y });
         
         entities = {
           ...entities,
