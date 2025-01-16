@@ -36,12 +36,15 @@ export const PitchCurveEditor = () => {
         systems={[systems.dragSystem]}
         entities={entities}
         style={{ width: '100%', height: '100%', position: 'relative' }}
+        onEvent={(e) => {
+          console.log('Game Engine Event:', e);
+        }}
       />
     </div>
   );
 };
 
-const ControlPoints = ({ points = [] }: { points?: Array<{ id: string; x: number; y: number }> }) => {
+const ControlPoints = ({ points = [] }: { points: Array<{ id: string; x: number; y: number }> }) => {
   return (
     <>
       {points.map((point) => (
