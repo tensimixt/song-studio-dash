@@ -8,6 +8,7 @@ interface Entities {
   points: {
     points: Point[];
   };
+  dragging?: string;
 }
 
 const dragSystem = (entities: Entities, { input }: any) => {
