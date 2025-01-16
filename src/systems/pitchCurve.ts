@@ -41,9 +41,6 @@ const dragSystem = (entities: Entities, { input }: any) => {
     const target = mouseDown.payload.target;
     const pointId = target.dataset.pointId;
     
-    console.log('Target:', target);
-    console.log('Point ID:', pointId);
-    
     if (pointId) {
       const container = target.closest('.game-engine');
       if (!container) return entities;
@@ -51,17 +48,11 @@ const dragSystem = (entities: Entities, { input }: any) => {
       const rect = container.getBoundingClientRect();
       const point = entities.points.points.find(p => p.id === pointId);
       
-      console.log('Container found:', container);
-      console.log('Point found:', point);
-      
       if (point) {
         const mouseX = mouseDown.payload.clientX - rect.left;
         const mouseY = mouseDown.payload.clientY - rect.top;
         
-        console.log('Mouse coordinates:', { mouseX, mouseY });
-        console.log('Point coordinates:', { x: point.x, y: point.y });
-        
-        entities = {
+        return {
           ...entities,
           dragging: {
             id: pointId,
@@ -84,10 +75,13 @@ const dragSystem = (entities: Entities, { input }: any) => {
     const mouseX = mouseMove.payload.clientX - rect.left;
     const mouseY = mouseMove.payload.clientY - rect.top;
 
-    console.log('New position:', { x: mouseX, y: mouseY });
+    const newX = mouseX - entities.dragging.offsetX;
+    const newY = mouseY - entities.dragging.offsetY;
+
+    console.log('New position:', { x: newX, y: newY });
 
     const updatedPoints = entities.points.points.map(p =>
-      p.id === entities.dragging.id ? { ...p, x: mouseX, y: mouseY } : p
+      p.id === entities.dragging.id ? { ...p, x: newX, y: newY } : p
     );
 
     entities.points.setPoints(updatedPoints);

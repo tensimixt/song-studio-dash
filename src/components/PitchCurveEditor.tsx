@@ -30,7 +30,11 @@ export const PitchCurveEditor = () => {
   };
 
   return (
-    <div className="w-full h-full relative">
+    <div 
+      className="w-full h-full relative"
+      onMouseDown={(e) => e.preventDefault()}
+      onMouseMove={(e) => e.preventDefault()}
+    >
       <GameEngine
         className="game-engine"
         systems={[systems.dragSystem]}
