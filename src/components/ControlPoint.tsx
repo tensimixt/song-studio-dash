@@ -22,11 +22,9 @@ export const ControlPoint: React.FC<ControlPointProps> = ({ id, x, y }) => {
         height: '12px',
         backgroundColor: '#3B82F6',
         borderRadius: '50%',
-        cursor: 'grab',
-        transform: `translate(${x}px, ${y}px)`,
       }}
       data-point-id={id}
-      className="hover:scale-150 transition-transform duration-200 active:cursor-grabbing"
+      className="hover:scale-150 transition-transform duration-200 cursor-grab active:cursor-grabbing"
     />
   );
 };

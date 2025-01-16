@@ -23,27 +23,23 @@ const dragSystem = (entities: Entities, { input, dispatch }: any) => {
     const target = mouseDown.payload.target;
     const pointId = target.dataset.pointId;
     if (pointId) {
-      const rect = target.closest('.game-engine').getBoundingClientRect();
+      const container = target.closest('.game-engine');
+      if (!container) return entities;
+
+      const rect = container.getBoundingClientRect();
       const x = mouseDown.payload.clientX - rect.left;
       const y = mouseDown.payload.clientY - rect.top;
-      
-      entities.dragging = pointId;
-      
-      const updatedPoints = points.map(p => {
-        if (p.id === pointId) {
-          return { ...p, x, y };
-        }
-        return p;
-      });
+
+      const updatedPoints = points.map(p => 
+        p.id === pointId ? { ...p, x, y } : p
+      );
 
       dispatch({ type: 'point-moved', points: updatedPoints });
       
       return {
         ...entities,
-        points: {
-          ...entities.points,
-          points: updatedPoints,
-        },
+        dragging: pointId,
+        points: { ...entities.points, points: updatedPoints },
       };
     }
   }
@@ -53,29 +49,25 @@ const dragSystem = (entities: Entities, { input, dispatch }: any) => {
     if (!container) return entities;
 
     const rect = container.getBoundingClientRect();
-    const x = mouseMove.payload.clientX - rect.left;
-    const y = mouseMove.payload.clientY - rect.top;
+    const x = Math.max(0, Math.min(mouseMove.payload.clientX - rect.left, rect.width));
+    const y = Math.max(0, Math.min(mouseMove.payload.clientY - rect.top, rect.height));
 
-    const updatedPoints = points.map(p => {
-      if (p.id === entities.dragging) {
-        return { ...p, x, y };
-      }
-      return p;
-    });
+    const updatedPoints = points.map(p => 
+      p.id === entities.dragging ? { ...p, x, y } : p
+    );
 
     dispatch({ type: 'point-moved', points: updatedPoints });
 
     return {
       ...entities,
-      points: {
-        ...entities.points,
-        points: updatedPoints,
-      },
+      points: { ...entities.points, points: updatedPoints },
     };
   }
 
   if (mouseUp && entities.dragging) {
-    delete entities.dragging;
+    const updatedEntities = { ...entities };
+    delete updatedEntities.dragging;
+    return updatedEntities;
   }
 
   return entities;
