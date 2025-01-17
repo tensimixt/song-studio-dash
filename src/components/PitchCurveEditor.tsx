@@ -68,15 +68,21 @@ export const PitchCurveEditor = () => {
     }
 
     return () => {
+      // Clean up PIXI application and references
+      if (containerRef.current?.firstChild) {
+        containerRef.current.removeChild(containerRef.current.firstChild);
+      }
+      
+      // Clear point references
+      pointsRef.current = [];
+      curveRef.current = null;
+      dragTarget.current = null;
+
+      // Destroy PIXI application last
       if (appRef.current) {
-        appRef.current.destroy(true);
-        if (containerRef.current?.firstChild) {
-          containerRef.current.removeChild(containerRef.current.firstChild);
-        }
+        const app = appRef.current;
         appRef.current = null;
-        pointsRef.current = [];
-        curveRef.current = null;
-        dragTarget.current = null;
+        app.destroy(true, { children: true, texture: true, baseTexture: true });
       }
     };
   }, []);
