@@ -16,19 +16,21 @@ export const PitchCurveEditor = () => {
   useEffect(() => {
     if (!containerRef.current || appRef.current) return;
 
+    // Create a container for the PIXI canvas
+    const pixiContainer = document.createElement('div');
+    containerRef.current.appendChild(pixiContainer);
+
+    // Initialize PIXI Application
     const app = new PIXI.Application({
       background: '#1F2937',
       resizeTo: containerRef.current,
       antialias: true,
     });
 
+    // Store the app reference before mounting the view
     appRef.current = app;
 
-    // Create a container for the PIXI canvas
-    const pixiContainer = document.createElement('div');
-    containerRef.current.appendChild(pixiContainer);
-
-    // Ensure the canvas is created and mounted before proceeding
+    // Mount the canvas after app is initialized
     if (app.view instanceof HTMLCanvasElement) {
       pixiContainer.appendChild(app.view);
 
@@ -82,7 +84,7 @@ export const PitchCurveEditor = () => {
       if (appRef.current) {
         const app = appRef.current;
         appRef.current = null;
-        app.destroy(true, { children: true, texture: true, baseTexture: true });
+        app.destroy(true, { children: true, texture: true });
       }
     };
   }, []);
