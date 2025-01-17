@@ -8,9 +8,9 @@ const GRID_COLOR = 0x2D2D2D;
 
 export const PitchCurveEditor = () => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const appRef = useRef<PIXI.Application>();
+  const appRef = useRef<PIXI.Application | null>(null);
   const pointsRef = useRef<PIXI.Graphics[]>([]);
-  const curveRef = useRef<PIXI.Graphics>();
+  const curveRef = useRef<PIXI.Graphics | null>(null);
   const dragTarget = useRef<PIXI.Graphics | null>(null);
 
   useEffect(() => {
@@ -24,11 +24,13 @@ export const PitchCurveEditor = () => {
       antialias: true,
     });
 
-    // Store the app reference before doing anything else
+    // Store the app reference
     appRef.current = app;
 
-    // Append the view to the DOM
-    containerRef.current.appendChild(app.view as HTMLCanvasElement);
+    // Create a container for the canvas
+    const pixiContainer = document.createElement('div');
+    containerRef.current.appendChild(pixiContainer);
+    pixiContainer.appendChild(app.view as HTMLCanvasElement);
 
     // Draw grid
     const grid = new PIXI.Graphics();
@@ -67,10 +69,11 @@ export const PitchCurveEditor = () => {
     // Cleanup function
     return () => {
       if (appRef.current) {
+        pixiContainer.remove();
         appRef.current.destroy(true);
-        appRef.current = undefined;
+        appRef.current = null;
         pointsRef.current = [];
-        curveRef.current = undefined;
+        curveRef.current = null;
       }
     };
   }, []);
