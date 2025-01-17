@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import * as PIXI from 'pixi.js';
 
 const POINT_RADIUS = 6;
-const LINE_COLOR = 0x3B82F6; // Blue color
+const LINE_COLOR = 0x3B82F6;
 const POINT_COLOR = 0x3B82F6;
 const GRID_COLOR = 0x2D2D2D;
 
@@ -27,10 +27,15 @@ export const PitchCurveEditor = () => {
     // Store the app reference
     appRef.current = app;
 
-    // Create a container for the canvas
+    // Create a container for the canvas and append it
     const pixiContainer = document.createElement('div');
     containerRef.current.appendChild(pixiContainer);
-    pixiContainer.appendChild(app.view as HTMLCanvasElement);
+    
+    // Ensure the view is properly cast and appended
+    const view = app.view as HTMLCanvasElement;
+    if (view) {
+      pixiContainer.appendChild(view);
+    }
 
     // Draw grid
     const grid = new PIXI.Graphics();
@@ -74,6 +79,7 @@ export const PitchCurveEditor = () => {
         appRef.current = null;
         pointsRef.current = [];
         curveRef.current = null;
+        dragTarget.current = null;
       }
     };
   }, []);
