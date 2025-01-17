@@ -14,7 +14,7 @@ export const PitchCurveEditor = () => {
   const dragTarget = useRef<PIXI.Graphics | null>(null);
 
   useEffect(() => {
-    if (!containerRef.current || appRef.current) return;
+    if (!containerRef.current) return;
 
     // Create PIXI Application
     const app = new PIXI.Application({
@@ -22,45 +22,52 @@ export const PitchCurveEditor = () => {
       resizeTo: containerRef.current,
       antialias: true,
     });
-    containerRef.current.appendChild(app.view as HTMLCanvasElement);
-    appRef.current = app;
 
-    // Draw grid
-    const grid = new PIXI.Graphics();
-    grid.lineStyle(0.5, GRID_COLOR, 0.5);
-    for (let x = 0; x < app.screen.width; x += 40) {
-      grid.moveTo(x, 0);
-      grid.lineTo(x, app.screen.height);
+    // Wait for the container to be available
+    if (containerRef.current) {
+      containerRef.current.appendChild(app.view as unknown as HTMLCanvasElement);
+      appRef.current = app;
+
+      // Draw grid
+      const grid = new PIXI.Graphics();
+      grid.lineStyle(0.5, GRID_COLOR, 0.5);
+      for (let x = 0; x < app.screen.width; x += 40) {
+        grid.moveTo(x, 0);
+        grid.lineTo(x, app.screen.height);
+      }
+      for (let y = 0; y < app.screen.height; y += 40) {
+        grid.moveTo(0, y);
+        grid.lineTo(app.screen.width, y);
+      }
+      app.stage.addChild(grid);
+
+      // Create curve graphics
+      const curve = new PIXI.Graphics();
+      app.stage.addChild(curve);
+      curveRef.current = curve;
+
+      // Create initial control points
+      const initialPoints = [
+        { x: 100, y: 100 },
+        { x: 300, y: 200 },
+        { x: 500, y: 300 },
+      ];
+
+      initialPoints.forEach((point) => {
+        const pointGraphics = createPoint(point.x, point.y);
+        app.stage.addChild(pointGraphics);
+        pointsRef.current.push(pointGraphics);
+      });
+
+      // Initial curve draw
+      drawCurve();
     }
-    for (let y = 0; y < app.screen.height; y += 40) {
-      grid.moveTo(0, y);
-      grid.lineTo(app.screen.width, y);
-    }
-    app.stage.addChild(grid);
 
-    // Create curve graphics
-    const curve = new PIXI.Graphics();
-    app.stage.addChild(curve);
-    curveRef.current = curve;
-
-    // Create initial control points
-    const initialPoints = [
-      { x: 100, y: 100 },
-      { x: 300, y: 200 },
-      { x: 500, y: 300 },
-    ];
-
-    initialPoints.forEach((point) => {
-      const pointGraphics = createPoint(point.x, point.y);
-      app.stage.addChild(pointGraphics);
-      pointsRef.current.push(pointGraphics);
-    });
-
-    // Initial curve draw
-    drawCurve();
-
+    // Cleanup function
     return () => {
-      app.destroy(true);
+      if (appRef.current) {
+        appRef.current.destroy(true);
+      }
     };
   }, []);
 
